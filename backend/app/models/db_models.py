@@ -17,6 +17,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
     password = Column(String, nullable=False)
+    email = Column(String, nullable=False)
 
     tournaments = relationship('Tournament', secondary=user_tournaments, back_populates='organizers')
 
@@ -26,6 +27,7 @@ class Tournament(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
-    link = Column(String, nullable=False)
+    sheets_link = Column(String, nullable=False)
+    form_link = Column(String, nullable=False)
 
     organizers = relationship('User', secondary=user_tournaments, back_populates='tournaments')
