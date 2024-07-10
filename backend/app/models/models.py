@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from typing import List
 from pydantic import BaseModel
 
@@ -7,7 +8,10 @@ class Tournament(BaseModel):
     name: str
     sheets_link: str
     form_link: str
-    organizers: List[int]  # List of user IDs
+    sign_up_deadline: datetime
+    start_date: date
+    end_date: date
+    organizers: List[str]
 
     class Config:
         orm_mode: True
@@ -15,6 +19,9 @@ class Tournament(BaseModel):
 
 class TournamentCreateRequest(BaseModel):
     name: str
+    sign_up_deadline: datetime
+    start_date: date
+    end_date: date
 
 
 class User(BaseModel):

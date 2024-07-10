@@ -146,3 +146,60 @@ def delete_google_form(form_id, google_creds):
     drive_service = build('drive', 'v3', credentials=creds)
     drive_service.files().delete(fileId=form_id).execute()
 
+
+def get_form_responses(form_id, google_creds):
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, ["https://www.googleapis.com/auth/drive"])
+    service = build('forms', 'v1', credentials=creds)
+
+    # Fetch the form responses
+    responses = service.forms().responses().list(formId=form_id).execute()
+
+    return responses.get('responses', [])
+
+
+def get_form_details(form_id, google_creds):
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, ["https://www.googleapis.com/auth/drive"])
+    service = build('forms', 'v1', credentials=creds)
+
+    # Fetch the form details
+    form_details = service.forms().get(formId=form_id).execute()
+
+    return form_details
+
+
+def get_existing_data(sheet_id, google_creds):
+    client = get_gspread_client(google_creds)
+    sheet = client.open_by_key(sheet_id).worksheet('Sheet1')
+    existing_data = sheet.get_all_records()
+    return existing_data
+
+
+def write_responses_to_sheet(sheet_id, responses, google_creds, question_map):
+    client = get_gspread_client(google_creds)
+    sheet = client.open_by_key(sheet_id).worksheet('Sheet1')
+
+    # Fetch existing data
+    existing_data = get_existing_data(sheet_id, google_creds)
+
+    # Extract existing Game Name and Tag Line pairs
+    existing_pairs = set((row['Game Name'], row['Tag Line']) for row in existing_data)
+
+    # Assuming the first row contains headers and data starts from the second row
+    start_row = len(existing_data) + 2
+
+    for response in responses:
+        game_name = ""
+        tag_line = ""
+        for question_id, answer in response['answers'].items():
+            question_text = question_map.get(question_id, "Unknown Question")
+            if question_text == "Game Name":
+                game_name = answer['textAnswers']['answers'][0]['value']
+            elif question_text == "Tag Line":
+                tag_line = answer['textAnswers']['answers'][0]['value']
+
+        # Check if the pair already exists
+        if (game_name, tag_line) not in existing_pairs:
+            # Append the new data to the sheet
+            sheet.append_row([game_name, tag_line], table_range=f'A{start_row}:B{start_row}')
+            start_row += 1
+

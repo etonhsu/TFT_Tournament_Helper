@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Table
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Table, Date, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -29,5 +29,8 @@ class Tournament(Base):
     name = Column(String, nullable=False)
     sheets_link = Column(String, nullable=False)
     form_link = Column(String, nullable=False)
+    sign_up_deadline = Column(DateTime, nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
 
     organizers = relationship('User', secondary=user_tournaments, back_populates='tournaments')

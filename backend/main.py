@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 from starlette.staticfiles import StaticFiles
 
-from app.endpoints import auth, create_tournament
+from app.endpoints import auth, create_tournament, get_tournament, users, manage_tournament
 
 app = FastAPI(title='TFT Tournament Helper API', version='1.0', description='API for managing TFT tournaments')
 
@@ -24,6 +24,9 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(create_tournament.router)
+app.include_router(get_tournament.router)
+app.include_router(manage_tournament.router)
+app.include_router(users.router)
 
 
 @app.on_event('startup')

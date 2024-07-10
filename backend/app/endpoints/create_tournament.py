@@ -13,8 +13,8 @@ router = APIRouter()
 
 @router.post('/create_tournament')
 async def create_tournament(request: TournamentCreateRequest, token: str = Depends(oauth2_scheme)):
-    secret_name = 'google-sheets-key'  # Secret name in AWS Secrets Manager
-    region_name = 'us-west-2'  # AWS region where your secret is stored
+    secret_name = 'google-sheets-key'
+    region_name = 'us-west-2'
     google_creds = get_google_creds(secret_name, region_name)
 
     user = get_current_user(token)
@@ -31,6 +31,9 @@ async def create_tournament(request: TournamentCreateRequest, token: str = Depen
                 name=request.name,
                 sheets_link=f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit",
                 form_link=f"https://docs.google.com/forms/d/{form_id}/edit",
+                sign_up_deadline=request.sign_up_deadline,
+                start_date=request.start_date,
+                end_date=request.end_date,
             )
             db.add(new_tournament)
             db.commit()
